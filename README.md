@@ -1,4 +1,13 @@
 # ArdTileLocator
+Web front end for real time ARD conversion tool fetching data from json-server running at background at http://localhost:3002.
+Some screenshots for the application
+## All Rs2/2a ARD tiles visualized over india 
+![](/images/ardtiles_hv.png)
+## All Rs2/2A Path Row tiles visualized over india 
+![](/images/pathrow_tiles.png)
+## Filtered reults on table 
+![](/images/location_selected.png)
+
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.1.
 
