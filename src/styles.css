@@ -1,1 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
+.btn.inverse-btn {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid #000;
+}
+.btn.inverse-btn:hover{
+    background-color: black!important;
+    color: white !important;
+}
+
+.btn.regular-btn{
+    background-color: #C73343 !important;
+    color: white!important ;
+}
+.btn.regular-btn:hover{
+    background-color: #dd338b !important;
+}
+
+.page-item.active .page-link {
+    background-color: #C73343 !important;
+    color: white !important;
+    border-color: #ccc !important;
+}
+.page-item .page-link {
+    background-color: white !important;
+    color: black !important;
+    border-color: #ccc !important;
+}

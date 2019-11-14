@@ -1,0 +1,191 @@
+<nav id="gde-navbar" class="navbar navbar-light navbar-expand-lg" style="min-height: 42px;">
+    <div class="container-fluid">
+        <div class="navbar-brand">
+            ARD Tile Locator
+        </div>
+        <button data-toggle="collapse" class="navbar-toggler" data-target="#navcol">
+            <span class="sr-only">Toggle Geo Data Explorer navigation</span>
+            <span><i class="fa fa-angle-down"></i></span>
+        </button>
+        <!-- <div class="collapse navbar-collapse"
+            style="text-align: right;"
+            id="navcol">
+            <ul class="nav navbar-nav ml-auto">
+                <li class="nav-item" role="presentation"><div class="nav-link" (click)="showManageLayers($event)"><i class="fas fa-layer-group mr-1"></i>Layers</div></li>
+                <li class="nav-item mr-1" role="presentation"><div class="nav-link" (click)="showSettings($event)"><i class="fas fa-cog mr-1"></i>Settings</div></li>
+            </ul>
+        </div> -->
+    </div>
+</nav>
+
+<div class="container-fluid mt-2">
+    <div class="row">
+<!-- form area -->
+        <div class="col-4">
+            
+            <form #userForm ngForm>
+                
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="radio" name="exampleRadios" id="option1" #option1 value="option1" checked>
+                    <label class="form-check-label" for="exampleRadios1">Convert from Path/Row to ARD Tile</label>
+                    <div class="form-row">
+                        <div class="col">
+                            <input type="number" #pathInput (change)="handlePathChange(pathInput.value)" class="form-control" placeholder="Path" min="1" max="200" step="1" (click)="handlePathBoxClick($event)">
+                        </div>
+                        <div class="col">
+                            <input type="number" #rowInput (change)="handleRowChange(rowInput.value)" class="form-control" placeholder="Row" min="1" max="200" step="1" (click)="handleRowBoxClick($event)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group form-check mt-3">
+                    <input class="form-check-input" type="radio" name="exampleRadios" id="option2" #option2 value="option2">
+                    <label class="form-check-label" for="exampleRadios1">Convert from Latitude/Longitude to ARD Tile and Path/Row</label>
+                    <div class="form-row">
+                        <div class="col">
+                            <input type="number" [value]="this.userInput.lat.toFixed(3)" #latInput (change)="handleLatChange(latInput.value)" class="form-control" placeholder="Latitude" (click)="handleLatBoxClick($event)">
+                        </div>
+                        <div class="col">
+                            <input type="number" [value]="this.userInput.lon.toFixed(3)" #lonInput (change)="handleLonChange(lonInput.value)" class="form-control" placeholder="Longitude" (click)="handleLonBoxClick($event)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group form-check mt-3">
+                    <input class="form-check-input" type="radio" name="exampleRadios" id="option3" #option3 value="option3">
+                    <label class="form-check-label" for="exampleRadios1">Convert from ARD Tile to Path/Row</label>
+                    <div class="form-row">
+                        <div class="col">
+                            <select class="custom-select" id="zoneSelection" (click)="handleTileZoneInputBoxClick($event)">
+                                <option value="IN">IN</option>
+                                <option value="SL">SL</option>
+                                <option value="AN">AN</option>
+                            </select>   
+                        </div>
+                        <div class="col">
+                            <input type="number" #hInput (change)="handleHChange(hInput.value)" class="form-control" placeholder="h" (click)="handleTileHInputBoxClick($event)">
+                        </div>
+                        <div class="col">
+                            <input type="number" #vInput (change)="handleHChange(vInput.value)" class="form-control" placeholder="v" (click)="handleTileVInputBoxClick($event)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group form-check mt-3">
+                    <input class="form-check-input" type="radio" name="exampleRadios" id="option4" #option4 value="option4">
+                    <label class="form-check-label" for="exampleRadios1">Search a place</label>
+                    <div class="form-row">
+                        <div class="col">
+                            <input type="text" #placeInput (change)="handlePlaceChange(placeInput.value)" class="form-control" placeholder="City or State" (click)="handlePlaceBoxClick($event)">
+                        </div>
+                        <div class="col">
+                            <button class="btn regular-btn mr-2" (click)="searchPlace($event)">Search</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="container-fluid">
+                    <button class="btn regular-btn mr-2 ml-2" type="submit" (click)="submitForm($event)">Convert</button>
+                    <button class="btn inverse-btn" (click)="resetForm($event)">Clear</button>
+                </div>
+            </form>
+            <!-- ard tile table area -->
+            <div class="mt-2" style="overflow-x: auto;">
+                <table *ngIf="this.rectangles.ardRectsFiltered && this.rectangles.ardRectsFiltered.length>0 && (!noSearchResultsFound)" class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Tile H</th>
+                            <th scope="col">Tile V</th>
+                        </tr>
+                    </thead>
+            
+                    <tbody *ngFor="let elem of this.rectangles.ardRectsFiltered; let idx=index">
+                        <tr>
+                            <th scope="row"> {{ idx + 1  }} </th>
+                            <td>{{elem.h}}</td>
+                            <td>{{elem.v}}</td>
+                        </tr> 
+                            
+                    </tbody>
+            
+                </table>
+            
+                <div *ngIf="noSearchResultsFound" class="container-fluid">
+                    <h3 class="text-center">
+                        No Results Found!!!
+                    </h3>
+                </div>
+            
+            </div>
+            <!-- path row tile table area -->
+            <div class="mt-2" style="overflow-x: auto;">
+                <table *ngIf="this.rectangles.pathRowRectsFiltered && this.rectangles.pathRowRectsFiltered.length>0 && (!noSearchResultsFound)" class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Path</th>
+                                <th scope="col">Row</th>
+                        </tr>
+                    </thead>
+            
+                    <tbody *ngFor="let elem of this.rectangles.pathRowRectsFiltered; let idx=index">
+                        <tr>
+                                <th scope="row"> {{ idx + 1  }} </th>
+                                <td>{{elem.path}}</td>
+                                <td>{{elem.row}}</td>
+                        </tr> 
+                            
+                    </tbody>
+            
+                </table>
+            
+                <div *ngIf="noSearchResultsFound" class="container-fluid">
+                    <h3 class="text-center">
+                        No Results Found!!!
+                    </h3>
+                </div>
+            
+            </div>
+        </div>
+       
+        <!-- leaflet Map -->
+        <div class="col-8">
+            <div style="height: calc(100vh - 140px);"
+                id="map"
+                leaflet 
+                [leafletOptions]="options"
+                [(leafletCenter)]="this.options.center"
+                (leafletMapReady)="onMapReady($event)"
+                (leafletMouseMove)="onMapMouseMove($event)"
+            >
+            
+
+                <div id="drawmap"
+                    leafletDraw
+                    [leafletDrawOptions]="drawOptions"
+                    (leafletDrawStart)="handleDrawStart($event)"
+                    (leafletDrawCreated)="handleDrawRectangle($event)"
+                >
+                </div>
+        
+                <div *ngIf="this.showRectangles">
+                    <div 
+                        *ngFor="let rect of this.rectangles.ardRectsFilteredLeafletRects" 
+                        [leafletLayer]="rect">
+                    </div>
+                    <div 
+                        *ngFor="let rect of this.rectangles.pathRowRectsFilteredLeafletRects" 
+                        [leafletLayer]="rect">
+                    </div>
+                </div>
+
+                <div 
+                    id="lat_long_container" 
+                    class="leaflet-bottom leaflet-left leaflet-bar mb-1 ml-1" 
+                    style="background-color: white; color: black;"
+                > {{ this.latLngString }} </div>
+            </div>
+        </div>
+    </div>
+</div>
